@@ -66,13 +66,71 @@ function showRoles() {
 
 //function to add a department, role, and employee
 function addDepts() {
+    inquirer.prompt(
+    {
+       type: "input",
+       name: "newDepts",
+       message: "What is the name of your new department?"
+    }).then (function(res) {
+        const newDept = res.newDepts
+        db.query(``)
+    })
 
 }
 
 function addEmployees() {
-
+    inquirer.prompt([
+        {
+           type: "input",
+           name: "firstName",
+           message: "What is the first name of your new employee?"
+        },
+        {
+           type:  "input",
+           name: "lastName",
+           message: "What is the last name of your new employee?"
+        },
+        {
+           type: "input",
+           name: "roleId",
+           message: "What is the employee's role ID?"
+        },
+        {
+           type: "input",
+           name: "managerId",
+           message: "What is the employee's manager's ID?"
+        }
+    ]).then(function (res) {
+        const firstName = res.fistName
+        const lastName = res.lastName
+        const roleId = res.roleId
+        const managerId = res.managerId
+        db.query(``)
+        
+    })
 }
 
 function addRole() {
-    
+    inquirer.prompt([
+        {
+           type: "input",
+           name: "empTitle",
+           message: "What is your employee's title?"
+        },
+        {
+           type: "input",
+           name: "empSalary",
+           message: "What is your employee's salary?" 
+        },
+        {
+           type: "input",
+           name: "empId",
+           message: "What is your employee's ID?"
+        }
+    ]).then(function(res) {
+        const title = res.empTitle
+        const salary = res.empSalary
+        const deptId = res.empId
+        db.query()
+    })
 }

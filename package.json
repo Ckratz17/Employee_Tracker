@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/Ckratz17/Employee_Tracker/issues"
   },
-  "homepage": "https://github.com/Ckratz17/Employee_Tracker#readme"
+  "homepage": "https://github.com/Ckratz17/Employee_Tracker#readme",
+  "dependencies": {
+    "inquirer": "^9.0.2",
+    "mysql2": "^2.3.3"
+  }
 }
