@@ -34,8 +34,45 @@ const db = mysql.createConnection(
   );
 
 //inquirer for prompts
+function menu() {
+    inquirer.prompt({
+        type: "list",
+        name: "menu",
+        message: "Select an option.",
+        choices: [
+            "View all departments",
+            "View all employees",
+            "View all roles",
+            "Add employee",
+            "Add Role",
+            "Update an employee's role",
+        ]
+    }).then(function (answer) {
 
+    })
+}
 //function to show all departments, roles and employees
+function showDepts() {
 
+}
+
+function showEmployees() {
+
+}
+
+function showRoles() {
+
+}
 
 //function to add a department, role, and employee
+function addDepts() {
+
+}
+
+function addEmployees() {
+
+}
+
+function addRole() {
+    
+}
