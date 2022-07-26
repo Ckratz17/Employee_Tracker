@@ -53,15 +53,21 @@ function menu() {
 }
 //function to show all departments, roles and employees
 function showDepts() {
-
+    db.query(`SELECT * FROM department`, (err, res) => {
+        console.table(res);
+        menu()
+    })
 }
 
 function showEmployees() {
-
+    db.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name AS department,`)
 }
 
 function showRoles() {
-
+    db.query(`SELECT * FROM roles`, (err, res) =>{
+        console.table(res);
+        menu()
+    })
 }
 
 //function to add a department, role, and employee
