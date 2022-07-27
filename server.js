@@ -2,7 +2,6 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 
-
 //connect to database
 const db = mysql.createConnection(
     {
@@ -18,6 +17,11 @@ const db = mysql.createConnection(
     console.log(`Connected to the movies_db database.`)
   );
 
+db.connect(function(err) {
+    if(err) throw err;
+    menu()
+})
+
 //inquirer for prompts
 function menu() {
     inquirer.prompt({
@@ -32,6 +36,7 @@ function menu() {
             "Add department",
             "Add Role",
             "Update an employee's role",
+            "Exit"
         ]
     }).then(function (answer) {
         switch (answer.menu) {
@@ -55,12 +60,14 @@ function menu() {
 
             case "Update an employee's role": updateRole();
             break;
+
+            case "Exit": db.end
         }
     })
 }
 //function to show all departments, roles and employees
 function showDepts() {
-    db.query(`SELECT * FROM department`, (err, res) => {
+    db.query("SELECT * FROM department", (err, res) => {
         console.table(res);
         menu()
     })
@@ -68,15 +75,14 @@ function showDepts() {
 
 function showEmployees() {
     db.query
-        (`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name AS department,
-          role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department on role.department_id = department.id`, (err, res) => {
+        ("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name AS department,role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department on role.department_id = department.id", (err, res) => {
             console.table(res)
             menu()
         })
 }
 
 function showRoles() {
-    db.query(`SELECT * FROM roles`, (err, res) =>{
+    db.query("SELECT * FROM roles", (err, res) =>{
         console.table(res);
         menu()
     })
