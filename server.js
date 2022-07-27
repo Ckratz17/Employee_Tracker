@@ -67,25 +67,53 @@ function menu() {
 }
 //function to show all departments, roles and employees
 function showDepts() {
-    db.query("SELECT * FROM department", (err, res) => {
+    db.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;", 
+    function(err, res) {
+        if(err) throw err
         console.table(res);
         menu()
     })
 }
 
 function showEmployees() {
-    db.query
-        ("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name AS department,role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department on role.department_id = department.id", (err, res) => {
+    db.query("SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;", 
+    function (err, res)  {
+            if (err) throw err
             console.table(res)
             menu()
         })
 }
 
 function showRoles() {
-    db.query("SELECT * FROM roles", (err, res) =>{
+    db.query("SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;", 
+    function (err, res) {
+        if(err) throw err
         console.table(res);
         menu()
     })
+}
+
+//create a query for the role title to add employee
+var roleArr = []
+function selectRole() {
+    db.query("SELECT * FROM role", function (err, res) {
+        if(err) throw err
+        for (var i = 0; i < res.length; i++) {
+            roleArr.push(res[i].title)
+        }
+    })
+    return roleArr
+}
+
+var managerArr = []
+function selectManager() {
+    db.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", function(err, res) {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+            managerArr.push(res[i].first_name)
+        }
+    })
+    return managerArr
 }
 
 //function to add a department, role, and employee
@@ -96,8 +124,8 @@ function addDepts() {
        name: "newDepts",
        message: "What is the name of your new department?"
     }).then (function(res) {
-        const newDept = res.newDepts
-        db.query(`INSERT INTO department (department_name) VALUES ("${newDept}")`, (err, res) => {
+        db.query("INSERT INTO department SET ?", (err, res) => {
+            if (err) throw err
             console.table(res)
             menu()
         })
@@ -118,21 +146,28 @@ function addEmployees() {
            message: "What is the last name of your new employee?"
         },
         {
-           type: "input",
-           name: "roleId",
-           message: "What is the employee's role ID?"
+           type: "list",
+           name: "roles",
+           message: "What is the employee's role?",
+           choices: selectRole()
         },
         {
-           type: "input",
-           name: "managerId",
-           message: "What is the employee's manager's ID?"
+           type: "rawlist",
+           name: "manager",
+           message: "What is the employee's manager's name?",
+           choices: selectManager()
         }
     ]).then(function (res) {
-        const firstName = res.fistName
-        const lastName = res.lastName
-        const roleId = res.roleId
-        const managerId = res.managerId
-        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${firstName}", "${lastName}", "${roleId}", "${managerId}")`, (err, res) => {
+        var roleId = selectRole().indexOf(res.role) +1
+        var managerId = selectManager().indexOf(res.choice) +1
+        db.query("INSERT INTO employee SET ?",
+        {
+            first_name: res.firstName,
+            last_name: res.lastName,
+            manager_id: managerId,
+            role_id: roleId
+        }, function (err, res)  {
+            if (err) throw err
             console.table(res)
             menu()
         })
@@ -140,52 +175,70 @@ function addEmployees() {
     })
 }
 
+
 function addRole() {
+    db.query("SELECT role.title AS Title, role.salary AS salary FROM role", (err, res) => {
+
     inquirer.prompt([
         {
            type: "input",
-           name: "empTitle",
+           name: "Title",
            message: "What is your employee's title?"
         },
         {
            type: "input",
-           name: "empSalary",
+           name: "Salary",
            message: "What is your employee's salary?" 
-        },
-        {
-           type: "input",
-           name: "empId",
-           message: "What is your employee's ID?"
         }
     ]).then(function(res) {
-        const title = res.empTitle
-        const salary = res.empSalary
-        const deptId = res.empId
-        db.query(`INSERT INTO role (title, salary, department_id) VALUES ("${title}", "${salary}", "${deptId}")`, (err, res) => {
+        db.query("INSERT INTO role SET ?",
+          {
+            title: res.Title,
+            salary: res.Salary
+          }, (err, res) => {
+            if (err) throw err
             console.table(res)
             menu()
         })
+    })
     })
 }
 
-function updateRole() {
+function updateEmployee() {
+  db.query("SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id = role.id;", function (err, res) {
+    if (err) throw err
+    console.log(res)
     inquirer.prompt([
         {
-         type: "input",
-         name: "emplUpdate",
-         message: "What is the employees new id?"
+         type: "rawlist",
+         name: "lastName",
+         choices: function() {
+            var lastName = []
+            for (var i = 0; i < res.length; i++) {
+                return lastName
+            }
+         },
+         message: "What is the employees last name?"
         },
         {
-         type: "input",
+         type: "rawlist",
          name: "newRole",
-         message: "What is the id for the new role?"
+         message: "What is your employee's new role?",
+         choices: selectRole()
         }
     ]).then(function (res) {
-        const updateEmpl = res.emplUpdate
-        const newRole = res.newRole
-        db.query(`UPDATE employee SET role_id = "${newRole}" Where id = "${updateEmpl}"`, (err, res) => {
+        var roleId = selectrole().index(val.role) + 1
+        db.query("UPDATE employee SET WHERE ?", {
+            last_name: val.lastName
+        },
+        {
+            role_id: roleId
+        }, 
+        (err, res) => {
+            if (err) throw err
             console.table(res)
             menu()
         })
     })
+  })
 }
