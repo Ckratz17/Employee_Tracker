@@ -136,10 +136,10 @@ function addEmployees() {
           choices: selectRole()
         },
         {
-            name: "choice",
-            type: "rawlist",
-            message: "Whats their managers name?",
-            choices: selectManager()
+          name: "choice",
+          type: "rawlist",
+          message: "Whats their managers name?",
+          choices: selectManager()
         }
     ]).then(function (val) {
       var roleId = selectRole().indexOf(val.role) + 1
@@ -207,7 +207,7 @@ function addEmployees() {
   }
 
 function addRole() { 
-  db.query("SELECT role.title AS Title, role.salary AS Salary FROM role",   function(err, res) {
+  db.query("SELECT role.title AS Title, role.salary AS Salary, role.department_id AS departmentId FROM role",   function(err, res) {
     inquirer.prompt([
         {
           name: "Title",
